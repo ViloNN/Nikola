@@ -1,0 +1,186 @@
+<!-- Subpage -->
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wybór Walentynki</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #ffe6e9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+        text-align: center;
+        overflow: hidden;
+      }
+      .card {
+        background: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        padding: 20px;
+        max-width: 400px;
+      }
+      .btn {
+        display: inline-block;
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 1rem;
+        color: #fff;
+        background: #e63946;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.3s;
+      }
+      .btn:hover {
+        background: #d62839;
+        transform: scale(1.1);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+      .confetti {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        display: none;
+      }
+      #loveMessage {
+        display: none;
+        font-size: 3rem;
+        color: #e63946;
+        margin-top: 20px;
+      }
+      @media (max-width: 768px) {
+        .card {
+          width: 90%;
+        }
+        .btn {
+          font-size: 0.9rem;
+          padding: 8px 16px;
+        }
+        #loveMessage {
+          font-size: 2rem;
+        }
+      }
+      .floating-heart {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: red;
+        clip-path: polygon(
+          50% 0%,
+          100% 30%,
+          85% 100%,
+          50% 75%,
+          15% 100%,
+          0% 30%
+        );
+        animation: fade-out 1s ease-out;
+      }
+      @keyframes fade-out {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Wybierz!</h1>
+      <button id="acceptBtn" class="btn">Będę twoją walentynką</button>
+      <button id="rejectBtn" class="btn">Spadaj na drzewo</button>
+    </div>
+
+    <div id="loveMessage">Kocham Cię, bąbelku! ❤️</div>
+
+    <canvas id="confettiCanvas" class="confetti"></canvas>
+
+    <script>
+      let clickCount = 0;
+      const maxClicks = 8;
+
+      const acceptBtn = document.getElementById("acceptBtn");
+      const rejectBtn = document.getElementById("rejectBtn");
+      const confettiCanvas = document.getElementById("confettiCanvas");
+      const confettiCtx = confettiCanvas.getContext("2d");
+      const loveMessage = document.getElementById("loveMessage");
+
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+
+      const confetti = [];
+      let isConfettiVisible = false;
+
+      function createConfetti() {
+        for (let i = 0; i < 200; i++) {
+          confetti.push({
+            x: Math.random() * confettiCanvas.width,
+            y: Math.random() * confettiCanvas.height,
+            r: Math.random() * 4 + 1,
+            dx: Math.random() * 4 - 2,
+            dy: Math.random() * 4 + 2,
+            color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+          });
+        }
+      }
+
+      function drawConfetti() {
+        confettiCtx.clearRect(
+          0,
+          0,
+          confettiCanvas.width,
+          confettiCanvas.height
+        );
+        confetti.forEach((c) => {
+          confettiCtx.beginPath();
+          confettiCtx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+          confettiCtx.fillStyle = c.color;
+          confettiCtx.fill();
+          c.x += c.dx;
+          c.y += c.dy;
+
+          if (c.y > confettiCanvas.height) c.y = 0;
+          if (c.x > confettiCanvas.width || c.x < 0) c.dx *= -1;
+        });
+      }
+
+      function animateConfetti() {
+        if (isConfettiVisible) {
+          drawConfetti();
+          requestAnimationFrame(animateConfetti);
+        }
+      }
+
+      createConfetti();
+
+      acceptBtn.addEventListener("click", () => {
+        clickCount++;
+        acceptBtn.style.transform = `scale(${1 + clickCount * 0.1})`;
+        if (clickCount === maxClicks) {
+          confettiCanvas.style.display = "block";
+          loveMessage.style.display = "block";
+          isConfettiVisible = true;
+          animateConfetti();
+        }
+      });
+
+      rejectBtn.addEventListener("click", () => {
+        acceptBtn.click();
+      });
+    </script>
+  </body>
+</html>
